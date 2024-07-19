@@ -62,6 +62,8 @@ Array.from(boxes).forEach(element => {
             turn = changeTurn();
             audioTurn.play();
             checkWin();
+            checkDraw();
+            
             console.log("turn", turn);
             socket.emit('move', { index: Array.from(boxes).indexOf(element), turn: boxtext.innerText});  //emit the move to the server
             if(!isGameOver)
@@ -116,3 +118,18 @@ socket.on('reset', ()=> {
     document.querySelector('.imgbox').getElementsByTagName('img')[0].style.width = "0px";
 
 })
+
+
+const checkDraw = ()=> {
+    let boxtext = document.getElementsByClassName('boxtext');
+    let filled = true;
+    Array.from(boxtext).forEach(element => {
+        if(element.innerText === '')
+            filled = false;
+    });
+    if(filled && !isGameOver){
+    document.querySelector('.info').innerText = "It's a draw!";
+    isGameOver = true;
+    gameover.play();
+    }
+}
