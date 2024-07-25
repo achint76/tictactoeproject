@@ -6,7 +6,12 @@ let turn = "X";
 let isGameOver = false;
 
 
+
+
+
 const socket = io();   //connecting to the socket.io server
+
+
 
 //function to change the turn
 const changeTurn = ()=>{
@@ -37,6 +42,8 @@ const checkWin = ()=>{
             document.querySelector('.imgbox').getElementsByTagName('img')[0].style.width = "200px";
             document.querySelector('.line').style.width = "20vw";
             document.querySelector('.line').style.transform = `translate(${e[3]}vw, ${e[4]}vw) rotate(${e[5]}deg)`
+
+          
         }
     })
 }
@@ -68,6 +75,9 @@ Array.from(boxes).forEach(element => {
             socket.emit('move', { index: Array.from(boxes).indexOf(element), turn: boxtext.innerText});  //emit the move to the server
             if(!isGameOver)
             document.getElementsByClassName("info")[0].innerText = "Turn for "+ turn;
+            // console.log("cuurrent player turn find");
+
+            // currentPlayer = (turn === "X") ? player1Id : player2Id;  // Switch the current player
         }
     })
 });
@@ -133,3 +143,8 @@ const checkDraw = ()=> {
     gameover.play();
     }
 }
+
+
+
+
+

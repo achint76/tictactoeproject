@@ -1,6 +1,6 @@
 // i will be writing in the comment why I have used these all tfor set-up  and other things so that it sill help easier to understand to others as well as for me in future
 
-
+require('dotenv').config();//for loading environment variables
 // Importing the Express.js library and assigning it to the constant 'express'
 const express = require('express');
 
@@ -9,7 +9,12 @@ const http = require('http');
 
 // Importing the Socket.io library and assigning it to 'socketIo'
 const socketIo = require('socket.io');
+const connectDB = require('./config/db');
 
+
+const authRoutes = require('./routes/auth');//importing auth route here
+const scoresRoutes = require('./models/scores.model');
+const authMiddleware = require('./middleware/authMiddleware');
 // Creating an Express application instance and assigning it to 'app'
 const app = express();
 
@@ -22,7 +27,16 @@ const io = socketIo(server);
 // Defining the port number for the server to listen on, defaulting to 3000 or using environment variable PORT
 const PORT = process.env.PORT || 3000;
 
+connectDB();
+//connect to mongodb
 
+// Middleware to parse JSON
+app.use(express.json());
+
+// Using the auth routes here
+app.use('/api/auth', authRoutes);
+
+app.use('/api/scores', scoresRoutes);
 // Serve static files from the public directory
 app.use(express.static('public'));
 
@@ -35,12 +49,14 @@ app.get('/', (req, res) => {
 // });
 
 let turn = "X";   //serveer maintains the current turn
-
 // Event listener in Socket.io for when a client connects to the server
 io.on('connection', (socket) => {
     console.log('A user connected'); // Logging when a user connects
 
     socket.emit('turn', turn);  //send the current turn to the client when they connect
+
+   
+
 
     socket.on('move', (data) => {
         io.emit('move', data);   //broadcast the move to all clients
@@ -54,11 +70,15 @@ io.on('connection', (socket) => {
         io.emit('turn', turn);
     });
 
+    
+
     // Event listener for when a client disconnects from the server
     socket.on('disconnect', () => {
         console.log('User disconnected'); // Logging when a user disconnects
     });
 });
+
+
 
 // Making the server listen on the specified port number (PORT) and logging a message upon successful start
 server.listen(PORT, () => {
